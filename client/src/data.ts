@@ -24,8 +24,16 @@ window.addEventListener('beforeunload', function () {
 
 
 
-export function readEntries(): Entry[] {
-  return data.entries;
+export async function readEntries(): Promise<Entry[]> {
+  const req = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  const res = await fetch('/api/entries', req);
+    if (!res.ok) throw new Error(`fetch Error ${res.status}`);
+  return await res.json();
 }
 
 // const result = fetch('/api/entries')
