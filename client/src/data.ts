@@ -7,32 +7,40 @@ export type Entry = UnsavedEntry & {
   entryId: number;
 };
 
-let data = {
+const data = {
   entries: [] as Entry[],
   nextEntryId: 1,
 };
 
 window.addEventListener('beforeunload', function () {
   const dataJSON = JSON.stringify(data);
-  localStorage.setItem('code-journal-data', dataJSON);
+  // localStorage.setItem('code-journal-data', dataJSON);
 });
 
-const localData = localStorage.getItem('code-journal-data');
-if (localData) {
-  data = JSON.parse(localData);
-}
+// const localData = localStorage.getItem('code-journal-data');
+// if (localData) {
+//   data = JSON.parse(localData);
+// }
+
+
 
 export function readEntries(): Entry[] {
   return data.entries;
 }
 
-export function addEntry(entry: UnsavedEntry): Entry {
-  const newEntry = {
-    ...entry,
-    entryId: data.nextEntryId++,
+// const result = fetch('/api/entries')
+
+export async function addEntry(entry: UnsavedEntry): Promise<Entry> {
+  const req = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(entry),
   };
-  data.entries.unshift(newEntry);
-  return newEntry;
+  const res = await fetch('/api/entries', req);
+  if (!res.ok) throw new Error(`fetch Error ${res.status}`);
+  return await res.json();
 }
 
 export function updateEntry(entry: Entry): Entry {
